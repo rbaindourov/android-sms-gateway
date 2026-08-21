@@ -98,7 +98,6 @@
         API. أعد تشغيل التطبيق لتطبيق التغييرات.</string>
     <string name="settings_local_address_not_found">غير متاح</string>
     <string name="settings_local_server">الخادم المحلي</string>
-    <string name="settings_offline">غير متصل</string>
     <string name="settings_online">متصل</string>
     <string name="settings_public_address_not_found">غير متاح</string>
     <string name="settings_start_on_boot">بدء التشغيل عند إقلاع النظام</string>

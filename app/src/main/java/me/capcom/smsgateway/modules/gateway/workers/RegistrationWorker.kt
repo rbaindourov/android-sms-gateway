@@ -13,6 +13,7 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import me.capcom.smsgateway.App
 import me.capcom.smsgateway.modules.gateway.GatewayService
+import me.capcom.smsgateway.modules.gateway.GatewaySettings
 import me.capcom.smsgateway.modules.logs.LogsService
 import me.capcom.smsgateway.modules.logs.db.LogEntry
 import org.koin.core.component.KoinComponent
@@ -24,6 +25,7 @@ class RegistrationWorker(
     params: WorkerParameters
 ) : CoroutineWorker(appContext, params), KoinComponent {
     private val logsSvc: LogsService by inject()
+    private val settings: GatewaySettings by inject()
 
     override suspend fun doWork(): Result {
         try {
@@ -32,11 +34,22 @@ class RegistrationWorker(
 
             when (isUpdate) {
                 true -> App.instance.gatewayService.updateDevice(applicationContext, token ?: return Result.success())
-                false -> App.instance.gatewayService.registerDevice(
-                    applicationContext,
-                    token,
-                    GatewayService.RegistrationMode.Anonymous
-                )
+                false -> {
+                    // Anonymous registration must only happen on explicit user action
+                    // (FirstStartDialogFragment). Background chains (autostart, boot)
+                    // must never create a new account silently.
+                    if (settings.registrationInfo == null) {
+                        logsSvc.insert(
+                            priority = LogEntry.Priority.INFO,
+                            module = NAME,
+                            message = "Skipping registration: device is not registered yet"
+                        )
+                        return Result.success()
+                    }
+
+                    // Already registered: refresh push token only, never re-register.
+                    App.instance.gatewayService.updateDevice(applicationContext, token ?: return Result.success())
+                }
             }
 
             return Result.success()

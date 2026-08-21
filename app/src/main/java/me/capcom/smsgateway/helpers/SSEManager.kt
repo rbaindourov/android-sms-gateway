@@ -27,6 +27,7 @@ class SSEManager(
     private var eventSource: EventSource? = null
     private var reconnectAttempts = 0
     private val isDisconnecting = AtomicBoolean(false)
+    private val lock = Any()
 
     // Event callbacks
     var onEvent: ((type: String?, data: String) -> Unit)? = null
@@ -35,65 +36,84 @@ class SSEManager(
     var onClosed: (() -> Unit)? = null
 
     fun connect() {
-        isDisconnecting.set(false)
+        // A reconnect job may race disconnect(): it passes scheduleReconnect()'s guard,
+        // then disconnect() sets the flag and cancels children, so the job can reach
+        // connect() afterwards. Guard the entry so the flag is never cleared mid-teardown.
+        synchronized(lock) {
+            if (isDisconnecting.get()) {
+                return
+            }
+            isDisconnecting.set(false)
+        }
         scope.launch {
-            try {
-                val request = Request.Builder()
-                    .url(url)
-                    .apply {
-                        header("Authorization", "Bearer $authToken")
-                    }
-                    .build()
-
-                eventSource = EventSources.createFactory(client)
-                    .newEventSource(request, object : EventSourceListener() {
-                        override fun onOpen(eventSource: EventSource, response: Response) {
-                            Log.d(TAG, "SSE connected")
-                            reconnectAttempts = 0
-                            onConnected?.invoke()
+            // Re-check after dispatch: disconnect() may have set the flag between the
+            // guard above and this coroutine actually running (e.g. after a delay in
+            // scheduleReconnect()).
+            synchronized(lock) {
+                if (isDisconnecting.get()) {
+                    return@launch
+                }
+                try {
+                    val request = Request.Builder()
+                        .url(url)
+                        .apply {
+                            header("Authorization", "Bearer $authToken")
                         }
+                        .build()
 
-                        override fun onEvent(
-                            eventSource: EventSource,
-                            id: String?,
-                            type: String?,
-                            data: String
-                        ) {
-                            Log.d(TAG, "Event received: $type - $data")
-                            onEvent?.invoke(type, data)
-                        }
+                    eventSource = EventSources.createFactory(client)
+                        .newEventSource(request, object : EventSourceListener() {
+                            override fun onOpen(eventSource: EventSource, response: Response) {
+                                Log.d(TAG, "SSE connected")
+                                reconnectAttempts = 0
+                                onConnected?.invoke()
+                            }
 
-                        override fun onClosed(eventSource: EventSource) {
-                            Log.d(TAG, "SSE connection closed")
-                            onClosed?.invoke()
-                            scheduleReconnect()
-                        }
+                            override fun onEvent(
+                                eventSource: EventSource,
+                                id: String?,
+                                type: String?,
+                                data: String
+                            ) {
+                                Log.d(TAG, "Event received: $type - $data")
+                                onEvent?.invoke(type, data)
+                            }
 
-                        override fun onFailure(
-                            eventSource: EventSource,
-                            t: Throwable?,
-                            response: Response?
-                        ) {
-                            Log.e(TAG, "SSE error", t)
-                            onError?.invoke(t)
-                            scheduleReconnect()
-                        }
-                    })
-            } catch (e: Exception) {
-                Log.e(TAG, "Connection failed", e)
-                scheduleReconnect()
+                            override fun onClosed(eventSource: EventSource) {
+                                Log.d(TAG, "SSE connection closed")
+                                onClosed?.invoke()
+                                scheduleReconnect()
+                            }
+
+                            override fun onFailure(
+                                eventSource: EventSource,
+                                t: Throwable?,
+                                response: Response?
+                            ) {
+                                Log.e(TAG, "SSE error", t)
+                                onError?.invoke(t)
+                                scheduleReconnect()
+                            }
+                        })
+                } catch (e: Exception) {
+                    Log.e(TAG, "Connection failed", e)
+                    scheduleReconnect()
+                }
             }
         }
     }
 
     fun disconnect() {
-        isDisconnecting.set(true)
-        scope.launch {
+        synchronized(lock) {
+            isDisconnecting.set(true)
+            // Close the OkHttp stream synchronously: coroutine cancellation
+            // does not close the socket, only EventSource.cancel() does.
             eventSource?.cancel()
             eventSource = null
-            reconnectAttempts = 0
         }
+        // Kill pending scheduleReconnect timers...
         scope.coroutineContext.cancelChildren()
+        reconnectAttempts = 0
     }
 
     private fun scheduleReconnect() {
@@ -109,8 +129,10 @@ class SSEManager(
         }
 
         scope.launch {
-            eventSource?.cancel()
-            eventSource = null
+            synchronized(lock) {
+                eventSource?.cancel()
+                eventSource = null
+            }
             Log.d(TAG, "Reconnecting in ${delay}ms (attempt $reconnectAttempts)")
             kotlinx.coroutines.delay(delay)
             connect()

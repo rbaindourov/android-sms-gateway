@@ -98,7 +98,6 @@
         через API. Перезапустите приложение для применения изменений.</string>
     <string name="settings_local_address_not_found">Недоступно</string>
     <string name="settings_local_server">Локальный сервер</string>
-    <string name="settings_offline">Офлайн</string>
     <string name="settings_online">Онлайн</string>
     <string name="settings_public_address_not_found">Недоступно</string>
     <string name="settings_start_on_boot">Автозапуск</string>

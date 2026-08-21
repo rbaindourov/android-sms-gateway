@@ -90,7 +90,6 @@
     <string name="settings_changed_via_api_restart_the_app_to_apply_changes">设置已通过 API 修改，重启应用以生效。</string>
     <string name="settings_local_address_not_found">不可用</string>
     <string name="settings_local_server">本地服务器</string>
-    <string name="settings_offline">离线</string>
     <string name="settings_online">在线</string>
     <string name="settings_public_address_not_found">不可用</string>
     <string name="settings_start_on_boot">开机启动</string>
