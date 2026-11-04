@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory app:title="@string/grafana_alerts">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_notifications"
+            android:key="grafana.ENABLED"
+            app:summary="@string/grafana_enabled_summary"
+            app:title="@string/grafana_enabled" />
+        <EditTextPreference
+            android:icon="@drawable/ic_signing_key"
+            android:key="grafana.TOKEN"
+            app:enableCopying="true"
+            app:title="@string/grafana_token"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            android:icon="@drawable/ic_local_server"
+            android:key="grafana.SERVICE_NAME"
+            app:title="@string/grafana_service_name"
+            app:useSimpleSummaryProvider="true" />
+        <Preference
+            android:icon="@drawable/ic_webhook"
+            android:key="transient.grafana_endpoint"
+            android:persistent="false"
+            android:title="@string/grafana_endpoint"
+            app:enableCopying="true" />
+        <Preference
+            android:icon="@drawable/ic_retry"
+            android:key="transient.grafana_send_test"
+            android:persistent="false"
+            app:summary="@string/grafana_send_test_summary"
+            app:title="@string/grafana_send_test" />
+        <Preference app:summary="@string/restart_required_to_apply_changes" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="transient.grafana_recent"
+        app:title="@string/grafana_recent_alerts" />
+</androidx.preference.PreferenceScreen>

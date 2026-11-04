@@ -1,7 +1,10 @@
 package me.capcom.smsgateway
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -49,6 +52,20 @@ class MainActivity : AppCompatActivity() {
         }.attach()
 
         processIntent(intent)
+        requestNotificationPermissionIfNeeded()
+    }
+
+    /** Android 13+ needs a runtime grant before any notification (incl. Grafana alerts) is shown. */
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) ==
+            PackageManager.PERMISSION_GRANTED
+        ) return
+
+        requestPermissions(
+            arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+            REQUEST_CODE_POST_NOTIFICATIONS
+        )
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -83,6 +100,7 @@ class MainActivity : AppCompatActivity() {
         const val TAB_INDEX_SETTINGS = 2
 
         private const val EXTRA_TAB_INDEX = "tabIndex"
+        private const val REQUEST_CODE_POST_NOTIFICATIONS = 4101
 
         fun starter(context: Context, tabIndex: Int): Intent {
             return Intent(context, MainActivity::class.java).apply {

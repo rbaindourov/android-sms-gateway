@@ -37,6 +37,7 @@ import me.capcom.smsgateway.R
 import me.capcom.smsgateway.domain.HealthResponse
 import me.capcom.smsgateway.extensions.configure
 import me.capcom.smsgateway.modules.health.HealthService
+import me.capcom.smsgateway.modules.grafana.GrafanaAlertsDiscovery
 import me.capcom.smsgateway.modules.health.domain.Status
 import me.capcom.smsgateway.modules.localserver.auth.AuthScopes
 import me.capcom.smsgateway.modules.localserver.auth.JwtService
@@ -44,6 +45,7 @@ import me.capcom.smsgateway.modules.localserver.auth.requireScope
 import me.capcom.smsgateway.modules.localserver.domain.Device
 import me.capcom.smsgateway.modules.localserver.routes.AuthRoutes
 import me.capcom.smsgateway.modules.localserver.routes.DocsRoutes
+import me.capcom.smsgateway.modules.localserver.routes.GrafanaRoutes
 import me.capcom.smsgateway.modules.localserver.routes.InboxRoutes
 import me.capcom.smsgateway.modules.localserver.routes.LogsRoutes
 import me.capcom.smsgateway.modules.localserver.routes.MessagesRoutes
@@ -60,6 +62,7 @@ class WebService : Service() {
     private val settings: LocalServerSettings by inject()
     private val notificationsService: NotificationsService by inject()
     private val healthService: HealthService by inject()
+    private val grafanaDiscovery: GrafanaAlertsDiscovery by inject()
     private val jwtService: JwtService by lazy { JwtService(get(), get(), get(), get()) }
 
     private val wakeLock: PowerManager.WakeLock by lazy {
@@ -148,6 +151,8 @@ class WebService : Service() {
                         HealthResponse(healthResult)
                     )
                 }
+                // Grafana webhook receiver: own bearer token, intentionally outside gateway auth
+                GrafanaRoutes(get(), get()).register(this)
                 authenticate("auth-basic", "auth-jwt") {
                     get("/") {
                         call.respond(mapOf("status" to "ok", "model" to Build.MODEL))
@@ -221,6 +226,7 @@ class WebService : Service() {
         super.onCreate()
 
         server.start()
+        grafanaDiscovery.start()
         wakeLock.acquire()
         wifiLock.acquire()
 
@@ -247,6 +253,7 @@ class WebService : Service() {
     }
 
     override fun onDestroy() {
+        grafanaDiscovery.stop()
         wifiLock.release()
         wakeLock.release()
         thread { server.stop() }

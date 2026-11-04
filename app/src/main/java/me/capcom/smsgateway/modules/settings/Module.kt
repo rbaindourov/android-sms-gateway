@@ -4,6 +4,7 @@ import androidx.preference.PreferenceManager
 import me.capcom.smsgateway.helpers.SettingsHelper
 import me.capcom.smsgateway.modules.encryption.EncryptionSettings
 import me.capcom.smsgateway.modules.gateway.GatewaySettings
+import me.capcom.smsgateway.modules.grafana.GrafanaAlertsSettings
 import me.capcom.smsgateway.modules.incoming.IncomingMessagesSettings
 import me.capcom.smsgateway.modules.localserver.LocalServerSettings
 import me.capcom.smsgateway.modules.logs.LogsSettings
@@ -40,6 +41,11 @@ val settingsModule = module {
     factory {
         LocalServerSettings(
             PreferencesStorage(get(), "localserver")
+        )
+    }
+    factory {
+        GrafanaAlertsSettings(
+            PreferencesStorage(get(), "grafana")
         )
     }
     factory {

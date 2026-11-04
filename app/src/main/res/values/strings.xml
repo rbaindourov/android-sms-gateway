@@ -187,4 +187,24 @@
     <string name="inbox_dotdotdot">Inbox…</string>
     <string name="inbox_settings_summary">Content provider monitoring, retention, etc.</string>
     <string name="inbox">Inbox</string>
+
+    <!-- Grafana alerts -->
+    <string name="grafana_alerts">Grafana alerts</string>
+    <string name="grafana_alerts_dotdotdot">Grafana alerts…</string>
+    <string name="grafana_alerts_summary">Wi-Fi alert notifications, discovery, token</string>
+    <string name="grafana_alerts_channel">Grafana alerts</string>
+    <string name="grafana_alerts_channel_description">Alerts pushed from Grafana over the local network</string>
+    <string name="grafana_enabled">Receive Grafana alerts</string>
+    <string name="grafana_enabled_summary">Accept alerts from Grafana and advertise this device on Wi-Fi (requires the local server to be running)</string>
+    <string name="grafana_token">Alert token</string>
+    <string name="grafana_service_name">Network service name</string>
+    <string name="grafana_endpoint">Webhook URL (this device)</string>
+    <string name="grafana_send_test">Send test alert</string>
+    <string name="grafana_send_test_summary">Shows a sample alert notification on this phone</string>
+    <string name="grafana_test_sent">Test alert sent</string>
+    <string name="grafana_test_alert_summary">If you can read this, alert notifications work.</string>
+    <string name="grafana_recent_alerts">Recent alerts</string>
+    <string name="grafana_no_alerts_yet">No alerts received yet</string>
+    <string name="grafana_clear_history">Clear history</string>
+    <string name="grafana_open_in_grafana">Open in Grafana</string>
 </resources>
