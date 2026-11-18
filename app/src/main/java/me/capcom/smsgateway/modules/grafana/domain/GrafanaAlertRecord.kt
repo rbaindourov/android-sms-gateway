@@ -27,6 +27,12 @@ data class GrafanaAlertRecord(
     val generatorUrl: String? = null,
     /** Grafana silence URL if provided by Alertmanager. */
     val silenceUrl: String? = null,
+    /** Original clicked redirect URL (for affiliate-traffic alerts). */
+    val clickedLinkUrl: String? = null,
+    /** Resolved external landing URL where the clicked link redirects. */
+    val landingUrl: String? = null,
+    /** Safe internal redirect-chain inspector URL (/affiliate-clicks/follow). */
+    val followUrl: String? = null,
     /** Alert labels (alertname, category, severity, domain, etc.). */
     val labels: Map<String, String>? = null,
 ) {

@@ -91,6 +91,25 @@ class GrafanaAlertNotifier(
             builder.setTimeoutAfter(RESOLVED_TIMEOUT_MS)
         }
 
+        val followDestinationUrl = GrafanaAlertParser.firstHttpUrl(
+            record.landingUrl,
+            record.followUrl,
+            record.clickedLinkUrl,
+        )
+        followDestinationUrl?.let { url ->
+            val view = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            builder.addAction(
+                0,
+                context.getString(R.string.grafana_follow_link_action),
+                PendingIntent.getActivity(
+                    context,
+                    notifId xor ACTION_FOLLOW_MASK,
+                    view,
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                )
+            )
+        }
+
         val grafanaUrl = GrafanaAlertParser.firstHttpUrl(record.url)
         grafanaUrl?.let { url ->
             val view = Intent(Intent.ACTION_VIEW, Uri.parse(url))
@@ -137,6 +156,7 @@ class GrafanaAlertNotifier(
         private const val ID_BASE = 10_000
         private const val ACTION_GRAFANA_MASK = 0x1000_0000
         private const val ACTION_BACKOFFICE_MASK = 0x2000_0000
+        private const val ACTION_FOLLOW_MASK = 0x4000_0000
 
         /** Stable per alert so "resolved" replaces "firing". */
         fun notificationId(alertId: String): Int =

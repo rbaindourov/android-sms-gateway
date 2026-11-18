@@ -24,8 +24,8 @@ repo (`native/phone-alert-relay`, see `docs/phone_alert_relay.md` there).
 | Receiver route `POST /grafana/alerts` (+ `GET` credential probe) | `modules/localserver/routes/GrafanaRoutes.kt` |
 | Payload parsing (unified + legacy alerting) | `modules/grafana/GrafanaAlertParser.kt` |
 | Persistent, bounded history (100, newest first, retry de‑dup 60 s) | `modules/grafana/GrafanaAlertStore.kt` |
-| High‑priority notifications, firing→resolved replaces same alert | `modules/grafana/GrafanaAlertNotifier.kt` |
-| Alert detail screen (status, full description, labels, Grafana & Back Office links) | `ui/GrafanaAlertDetailActivity.kt` |
+| High‑priority notifications (`Follow link`, `Open in Grafana`, `Back office`), firing→resolved replaces same alert | `modules/grafana/GrafanaAlertNotifier.kt` |
+| Alert detail screen (status, tappable web links in summary/description/labels, Follow Destination URL & Redirect Inspector buttons, Grafana & Back Office links) | `ui/GrafanaAlertDetailActivity.kt` |
 | mDNS advertisement, Wi‑Fi only | `modules/grafana/GrafanaAlertsDiscovery.kt` |
 | Settings screen **Settings → Grafana alerts…** | `ui/settings/GrafanaAlertsSettingsFragment.kt` |
 

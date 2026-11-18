@@ -76,6 +76,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
+                android:autoLink="web"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                 android:textIsSelectable="true"
                 tools:text="Affiliate Network Traffic &amp; Outbound Clicks" />
@@ -159,6 +160,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
+                        android:autoLink="web"
                         android:fontFamily="monospace"
                         android:lineSpacingExtra="3dp"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
@@ -168,10 +170,27 @@
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonOpenGrafana"
+                android:id="@+id/buttonFollowDestination"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="18dp"
+                android:visibility="gone"
+                android:text="@string/grafana_open_destination" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonInspectRedirect"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"
+                android:text="@string/grafana_inspect_redirect" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonOpenGrafana"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:text="@string/grafana_open_in_grafana" />
 
             <com.google.android.material.button.MaterialButton

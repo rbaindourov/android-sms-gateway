@@ -65,6 +65,8 @@ class GrafanaAlertDetailActivity : AppCompatActivity() {
             binding.textAlertSummary.text = getString(R.string.grafana_alert_not_found_summary)
             binding.cardDetails.visibility = View.GONE
             binding.cardLabels.visibility = View.GONE
+            binding.buttonFollowDestination.visibility = View.GONE
+            binding.buttonInspectRedirect.visibility = View.GONE
             binding.buttonOpenGrafana.visibility = View.GONE
             binding.buttonOpenBackoffice.visibility = View.GONE
             binding.buttonOpenSilenceOrRule.visibility = View.GONE
@@ -143,6 +145,22 @@ class GrafanaAlertDetailActivity : AppCompatActivity() {
             binding.cardLabels.visibility = View.GONE
         }
 
+        val landingTargetUrl = GrafanaAlertParser.firstHttpUrl(record.landingUrl)
+        val clickedLinkUrl = GrafanaAlertParser.firstHttpUrl(record.clickedLinkUrl)
+        val followTargetUrl = GrafanaAlertParser.firstHttpUrl(record.followUrl)
+        val destinationBtnUrl = landingTargetUrl ?: clickedLinkUrl
+        val destinationBtnLabel = if (landingTargetUrl != null) {
+            getString(R.string.grafana_open_destination)
+        } else {
+            getString(R.string.grafana_open_clicked_link)
+        }
+        binding.buttonFollowDestination.text = destinationBtnLabel
+        configureLinkButton(binding.buttonFollowDestination, destinationBtnUrl)
+        configureLinkButton(
+            binding.buttonInspectRedirect,
+            followTargetUrl?.takeIf { it != destinationBtnUrl }
+        )
+
         val grafanaUrl = GrafanaAlertParser.firstHttpUrl(record.url)
         val backofficeUrl = GrafanaAlertParser.firstHttpUrl(record.backofficeUrl)
             ?.takeIf { it != grafanaUrl }
@@ -208,6 +226,9 @@ class GrafanaAlertDetailActivity : AppCompatActivity() {
             backofficeUrl = intent.getStringExtra(EXTRA_BACKOFFICE_URL),
             generatorUrl = intent.getStringExtra(EXTRA_GENERATOR_URL),
             silenceUrl = intent.getStringExtra(EXTRA_SILENCE_URL),
+            clickedLinkUrl = intent.getStringExtra(EXTRA_CLICKED_LINK_URL),
+            landingUrl = intent.getStringExtra(EXTRA_LANDING_URL),
+            followUrl = intent.getStringExtra(EXTRA_FOLLOW_URL),
         )
     }
 
@@ -238,6 +259,9 @@ class GrafanaAlertDetailActivity : AppCompatActivity() {
         private const val EXTRA_BACKOFFICE_URL = "backofficeUrl"
         private const val EXTRA_GENERATOR_URL = "generatorUrl"
         private const val EXTRA_SILENCE_URL = "silenceUrl"
+        private const val EXTRA_CLICKED_LINK_URL = "clickedLinkUrl"
+        private const val EXTRA_LANDING_URL = "landingUrl"
+        private const val EXTRA_FOLLOW_URL = "followUrl"
         private const val EXTRA_STARTS_AT = "startsAt"
 
         fun starter(context: Context, record: GrafanaAlertRecord): Intent {
@@ -254,6 +278,9 @@ class GrafanaAlertDetailActivity : AppCompatActivity() {
                 putExtra(EXTRA_BACKOFFICE_URL, record.backofficeUrl)
                 putExtra(EXTRA_GENERATOR_URL, record.generatorUrl)
                 putExtra(EXTRA_SILENCE_URL, record.silenceUrl)
+                putExtra(EXTRA_CLICKED_LINK_URL, record.clickedLinkUrl)
+                putExtra(EXTRA_LANDING_URL, record.landingUrl)
+                putExtra(EXTRA_FOLLOW_URL, record.followUrl)
                 putExtra(EXTRA_STARTS_AT, record.startsAt)
             }
         }

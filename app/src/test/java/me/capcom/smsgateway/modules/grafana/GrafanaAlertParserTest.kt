@@ -199,6 +199,43 @@ class GrafanaAlertParserTest {
         assertNull(unsafe.backofficeUrl)
     }
 
+    @Test
+    fun extractsClickedAffiliateLinkLandingUrlAndFollowInspectorUrl() {
+        val r = GrafanaAlertParser.parse(
+            payload(
+                """
+                {
+                  "status": "firing",
+                  "externalURL": "http://ww2.local:3010/",
+                  "alerts": [{
+                    "status": "firing",
+                    "fingerprint": "592b1d3afed4fdaf",
+                    "labels": {
+                      "alertname": "Affiliate Referral Traffic & Link Activity",
+                      "category": "affiliate-traffic",
+                      "clicked_link": "https://paleodietclub.com/go/amazon/b0013oxkhc",
+                      "landing_url": "https://www.amazon.com/dp/B0013OXKHC?tag=webdesignerdo-20",
+                      "follow_url": "http://ww2.local:3020/affiliate-clicks/follow?domain=paleodietclub.com&path=%2Fgo%2Famazon%2Fb0013oxkhc"
+                    },
+                    "annotations": {
+                      "summary": "https://paleodietclub.com/go/amazon/b0013oxkhc -> https://www.amazon.com/dp/B0013OXKHC?tag=webdesignerdo-20",
+                      "landing_url": "https://www.amazon.com/dp/B0013OXKHC?tag=webdesignerdo-20",
+                      "follow_url": "http://ww2.local:3020/affiliate-clicks/follow?domain=paleodietclub.com&path=%2Fgo%2Famazon%2Fb0013oxkhc"
+                    }
+                  }]
+                }
+                """.trimIndent()
+            )
+        ).single()
+
+        assertEquals("https://paleodietclub.com/go/amazon/b0013oxkhc", r.clickedLinkUrl)
+        assertEquals("https://www.amazon.com/dp/B0013OXKHC?tag=webdesignerdo-20", r.landingUrl)
+        assertEquals(
+            "http://ww2.local:3020/affiliate-clicks/follow?domain=paleodietclub.com&path=%2Fgo%2Famazon%2Fb0013oxkhc",
+            r.followUrl
+        )
+    }
+
     @Suppress("unused")
     private fun unused(r: GrafanaAlertRecord) = r
 }

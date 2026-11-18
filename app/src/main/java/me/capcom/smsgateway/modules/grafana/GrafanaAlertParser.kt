@@ -55,6 +55,18 @@ object GrafanaAlertParser {
                     ),
                     generatorUrl = firstHttpUrl(payload.ruleUrl),
                     silenceUrl = null,
+                    clickedLinkUrl = firstHttpUrl(
+                        commonAnnotations["clicked_link"],
+                        commonLabels["clicked_link"],
+                    ),
+                    landingUrl = firstHttpUrl(
+                        commonAnnotations["landing_url"],
+                        commonLabels["landing_url"],
+                    ),
+                    followUrl = firstHttpUrl(
+                        commonAnnotations["follow_url"],
+                        commonLabels["follow_url"],
+                    ),
                     labels = mergedLabels,
                 )
             )
@@ -97,6 +109,22 @@ object GrafanaAlertParser {
                 commonAnnotations["source_url"],
             )
 
+            val clickedLinkUrl = firstHttpUrl(
+                annotations["clicked_link"],
+                alertLabels["clicked_link"],
+                commonLabels["clicked_link"],
+            )
+            val landingUrl = firstHttpUrl(
+                annotations["landing_url"],
+                alertLabels["landing_url"],
+                commonLabels["landing_url"],
+            )
+            val followUrl = firstHttpUrl(
+                annotations["follow_url"],
+                alertLabels["follow_url"],
+                commonLabels["follow_url"],
+            )
+
             GrafanaAlertRecord(
                 id = alert.fingerprint?.takeIf { it.isNotBlank() }
                     ?: fallbackId(source, title, alertLabels),
@@ -112,6 +140,9 @@ object GrafanaAlertParser {
                 backofficeUrl = backofficeUrl,
                 generatorUrl = firstHttpUrl(alert.generatorURL, payload.ruleUrl),
                 silenceUrl = firstHttpUrl(alert.silenceURL),
+                clickedLinkUrl = clickedLinkUrl,
+                landingUrl = landingUrl,
+                followUrl = followUrl,
                 labels = mergedLabels,
             )
         }

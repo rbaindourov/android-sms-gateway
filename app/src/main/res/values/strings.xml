@@ -209,6 +209,10 @@
     <string name="grafana_open_in_grafana">Open in Grafana</string>
     <string name="grafana_open_in_backoffice">Open Back Office</string>
     <string name="grafana_open_backoffice_action">Back office</string>
+    <string name="grafana_open_destination">Follow Destination URL</string>
+    <string name="grafana_open_clicked_link">Open Clicked Redirect</string>
+    <string name="grafana_inspect_redirect">Inspect Redirect Hops</string>
+    <string name="grafana_follow_link_action">Follow link</string>
     <string name="grafana_open_rule_or_silence">Inspect Rule / Silence</string>
     <string name="grafana_view_recent_alerts">View all recent alerts</string>
     <string name="grafana_alert_details_title">Alert details</string>
