@@ -152,6 +152,53 @@ class GrafanaAlertParserTest {
         assertEquals("http://g/runbook", onlyRunbook.url)
     }
 
+    @Test
+    fun extractsDescriptionBackofficeUrlSilenceUrlLabelsAndRejectsNonHttpUrls() {
+        val r = GrafanaAlertParser.parse(
+            payload(
+                """
+                {
+                  "status": "firing",
+                  "externalURL": "http://ww2.local:3010/",
+                  "commonLabels": {"env": "prod", "severity": "info"},
+                  "alerts": [{
+                    "status": "firing",
+                    "fingerprint": "aff-1",
+                    "labels": {"alertname": "Affiliate Click", "category": "affiliate-traffic"},
+                    "annotations": {
+                      "summary": "Affiliate Network Traffic",
+                      "description": "Full affiliate redirect details here",
+                      "dashboard_url": "http://ww2.local:3010/d/affiliate-clicks",
+                      "backoffice_url": "http://ww2.local:3020/affiliate-clicks",
+                      "source_url": "https://affiliatepartners.biz/admin"
+                    },
+                    "generatorURL": "http://ww2.local:3010/alerting/grafana/aff/view",
+                    "silenceURL": "http://ww2.local:3010/alerting/silence/new"
+                  }]
+                }
+                """.trimIndent()
+            )
+        ).single()
+
+        assertEquals("Full affiliate redirect details here", r.description)
+        assertEquals("http://ww2.local:3010/d/affiliate-clicks", r.url)
+        assertEquals("http://ww2.local:3020/affiliate-clicks", r.backofficeUrl)
+        assertEquals("http://ww2.local:3010/alerting/grafana/aff/view", r.generatorUrl)
+        assertEquals("http://ww2.local:3010/alerting/silence/new", r.silenceUrl)
+        assertEquals(
+            mapOf("env" to "prod", "severity" to "info", "alertname" to "Affiliate Click", "category" to "affiliate-traffic"),
+            r.labels
+        )
+
+        val unsafe = GrafanaAlertParser.parse(
+            payload(
+                """{"alerts":[{"fingerprint":"bad","labels":{"alertname":"X"},"dashboardURL":"javascript:alert(1)","annotations":{"source_url":"file:///etc/passwd","dashboard_url":"https://ok.local/d/1"}}]}"""
+            )
+        ).single()
+        assertEquals("https://ok.local/d/1", unsafe.url)
+        assertNull(unsafe.backofficeUrl)
+    }
+
     @Suppress("unused")
     private fun unused(r: GrafanaAlertRecord) = r
 }

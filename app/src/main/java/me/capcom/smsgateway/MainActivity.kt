@@ -70,13 +70,38 @@ class MainActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        setIntent(intent)
         processIntent(intent)
     }
 
     private fun processIntent(intent: Intent) {
-        val tabIndex = intent.getIntExtra(EXTRA_TAB_INDEX, TAB_INDEX_HOME)
+        val openGrafanaAlerts = intent.getBooleanExtra(EXTRA_OPEN_GRAFANA_ALERTS, false)
+        val tabIndex = if (openGrafanaAlerts) {
+            TAB_INDEX_SETTINGS
+        } else {
+            intent.getIntExtra(EXTRA_TAB_INDEX, TAB_INDEX_HOME)
+        }
 
         binding.viewPager.currentItem = tabIndex
+
+        if (openGrafanaAlerts) {
+            intent.removeExtra(EXTRA_OPEN_GRAFANA_ALERTS)
+            openGrafanaAlertsScreen()
+        }
+    }
+
+    private fun openGrafanaAlertsScreen() {
+        val existing = supportFragmentManager.findFragmentByTag(TAG_GRAFANA_ALERTS)
+        if (existing != null) return
+
+        supportFragmentManager.beginTransaction()
+            .replace(
+                android.R.id.content,
+                me.capcom.smsgateway.ui.settings.GrafanaAlertsSettingsFragment(),
+                TAG_GRAFANA_ALERTS
+            )
+            .addToBackStack(TAG_GRAFANA_ALERTS)
+            .commitAllowingStateLoss()
     }
 
     class FragmentsAdapter(activity: AppCompatActivity) :
@@ -100,11 +125,16 @@ class MainActivity : AppCompatActivity() {
         const val TAB_INDEX_SETTINGS = 2
 
         private const val EXTRA_TAB_INDEX = "tabIndex"
+        private const val EXTRA_OPEN_GRAFANA_ALERTS = "openGrafanaAlerts"
+        private const val TAG_GRAFANA_ALERTS = "grafana_alerts_settings"
         private const val REQUEST_CODE_POST_NOTIFICATIONS = 4101
 
-        fun starter(context: Context, tabIndex: Int): Intent {
+        fun starter(context: Context, tabIndex: Int, openGrafanaAlerts: Boolean = false): Intent {
             return Intent(context, MainActivity::class.java).apply {
                 putExtra(EXTRA_TAB_INDEX, tabIndex)
+                if (openGrafanaAlerts) {
+                    putExtra(EXTRA_OPEN_GRAFANA_ALERTS, true)
+                }
             }
         }
     }

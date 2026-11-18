@@ -207,4 +207,17 @@
     <string name="grafana_no_alerts_yet">No alerts received yet</string>
     <string name="grafana_clear_history">Clear history</string>
     <string name="grafana_open_in_grafana">Open in Grafana</string>
+    <string name="grafana_open_in_backoffice">Open Back Office</string>
+    <string name="grafana_open_backoffice_action">Back office</string>
+    <string name="grafana_open_rule_or_silence">Inspect Rule / Silence</string>
+    <string name="grafana_view_recent_alerts">View all recent alerts</string>
+    <string name="grafana_alert_details_title">Alert details</string>
+    <string name="grafana_alert_details_section">Details</string>
+    <string name="grafana_alert_labels_section">Labels</string>
+    <string name="grafana_status_firing">FIRING</string>
+    <string name="grafana_status_resolved">RESOLVED</string>
+    <string name="grafana_no_extra_details">No additional details were included in this alert payload.</string>
+    <string name="grafana_alert_not_found_title">Alert not found</string>
+    <string name="grafana_alert_not_found_summary">This alert is no longer in recent history.</string>
+    <string name="grafana_unable_to_open_url">Unable to open link: %1$s</string>
 </resources>

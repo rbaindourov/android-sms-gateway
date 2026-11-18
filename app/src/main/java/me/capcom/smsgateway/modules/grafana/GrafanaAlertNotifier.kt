@@ -11,9 +11,9 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import me.capcom.smsgateway.MainActivity
 import me.capcom.smsgateway.R
 import me.capcom.smsgateway.modules.grafana.domain.GrafanaAlertRecord
+import me.capcom.smsgateway.ui.GrafanaAlertDetailActivity
 
 /**
  * Posts a loud, high-priority notification for each Grafana alert.
@@ -60,6 +60,11 @@ class GrafanaAlertNotifier(
             append(meta)
         }.trim()
 
+        val notifId = notificationId(record.id)
+        val detailIntent = GrafanaAlertDetailActivity.starter(context, record).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        }
+
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.notif_alert)
             .setContentTitle(heading)
@@ -76,8 +81,8 @@ class GrafanaAlertNotifier(
             .setContentIntent(
                 PendingIntent.getActivity(
                     context,
-                    0,
-                    MainActivity.starter(context, MainActivity.TAB_INDEX_SETTINGS),
+                    notifId,
+                    detailIntent,
                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                 )
             )
@@ -86,14 +91,31 @@ class GrafanaAlertNotifier(
             builder.setTimeoutAfter(RESOLVED_TIMEOUT_MS)
         }
 
-        record.url?.let { url ->
+        val grafanaUrl = GrafanaAlertParser.firstHttpUrl(record.url)
+        grafanaUrl?.let { url ->
             val view = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             builder.addAction(
                 0,
                 context.getString(R.string.grafana_open_in_grafana),
                 PendingIntent.getActivity(
                     context,
-                    notificationId(record.id),
+                    notifId xor ACTION_GRAFANA_MASK,
+                    view,
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                )
+            )
+        }
+
+        val backofficeUrl = GrafanaAlertParser.firstHttpUrl(record.backofficeUrl)
+            ?.takeIf { it != grafanaUrl }
+        backofficeUrl?.let { url ->
+            val view = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            builder.addAction(
+                0,
+                context.getString(R.string.grafana_open_backoffice_action),
+                PendingIntent.getActivity(
+                    context,
+                    notifId xor ACTION_BACKOFFICE_MASK,
                     view,
                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                 )
@@ -101,7 +123,7 @@ class GrafanaAlertNotifier(
         }
 
         try {
-            manager.notify(notificationId(record.id), builder.build())
+            manager.notify(notifId, builder.build())
         } catch (e: SecurityException) {
             // POST_NOTIFICATIONS revoked between the check and the call.
             Log.w(TAG, "Unable to post alert notification", e)
@@ -113,6 +135,8 @@ class GrafanaAlertNotifier(
         private const val TAG = "GrafanaAlertNotifier"
         private const val RESOLVED_TIMEOUT_MS = 60L * 60L * 1000L
         private const val ID_BASE = 10_000
+        private const val ACTION_GRAFANA_MASK = 0x1000_0000
+        private const val ACTION_BACKOFFICE_MASK = 0x2000_0000
 
         /** Stable per alert so "resolved" replaces "firing". */
         fun notificationId(alertId: String): Int =

@@ -81,4 +81,17 @@ class GrafanaAlertStoreTest {
         store.clear()
         assertTrue(store.list().isEmpty())
     }
+
+    @Test
+    fun findByIdMatchesExactTimestampOrNewestRecord() {
+        val store = GrafanaAlertStore(InMemoryStorage())
+        store.add(listOf(rec("a", status = "firing", at = 1_000L)))
+        store.add(listOf(rec("a", status = "resolved", at = 2_000L)))
+
+        assertEquals("firing", store.findById("a", 1_000L)?.status)
+        assertEquals("resolved", store.findById("a", 2_000L)?.status)
+        assertEquals("resolved", store.findById("a")?.status)
+        assertEquals("resolved", store.findById("a", 9_999L)?.status)
+        assertEquals(null, store.findById("missing"))
+    }
 }

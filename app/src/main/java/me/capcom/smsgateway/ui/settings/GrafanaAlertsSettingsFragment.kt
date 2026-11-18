@@ -1,7 +1,5 @@
 package me.capcom.smsgateway.ui.settings
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.text.format.DateUtils
 import androidx.lifecycle.lifecycleScope
@@ -19,6 +17,7 @@ import me.capcom.smsgateway.modules.grafana.domain.GrafanaWebhookAlert
 import me.capcom.smsgateway.modules.grafana.domain.GrafanaWebhookPayload
 import me.capcom.smsgateway.modules.localserver.LocalServerSettings
 import me.capcom.smsgateway.providers.LocalIPProvider
+import me.capcom.smsgateway.ui.GrafanaAlertDetailActivity
 import org.koin.android.ext.android.inject
 
 class GrafanaAlertsSettingsFragment : BasePreferenceFragment() {
@@ -80,15 +79,9 @@ class GrafanaAlertsSettingsFragment : BasePreferenceFragment() {
                 isIconSpaceReserved = false
                 title = (if (record.isFiring) "🔥 " else "✅ ") + record.title
                 summary = describe(record)
-                if (record.url != null) {
-                    setOnPreferenceClickListener {
-                        runCatching {
-                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(record.url)))
-                        }
-                        true
-                    }
-                } else {
-                    isSelectable = false
+                setOnPreferenceClickListener {
+                    startActivity(GrafanaAlertDetailActivity.starter(requireContext(), record))
+                    true
                 }
             })
         }
@@ -126,9 +119,14 @@ class GrafanaAlertsSettingsFragment : BasePreferenceFragment() {
         alerts = listOf(
             GrafanaWebhookAlert(
                 status = GrafanaAlertRecord.STATUS_FIRING,
-                labels = mapOf("alertname" to "SMSGate test alert", "severity" to "info"),
+                labels = mapOf(
+                    "alertname" to "SMSGate test alert",
+                    "severity" to "info",
+                    "category" to "test"
+                ),
                 annotations = mapOf(
-                    "summary" to getString(R.string.grafana_test_alert_summary)
+                    "summary" to getString(R.string.grafana_test_alert_summary),
+                    "description" to getString(R.string.grafana_test_alert_summary),
                 ),
                 fingerprint = "smsgate-test-${System.currentTimeMillis()}",
             )

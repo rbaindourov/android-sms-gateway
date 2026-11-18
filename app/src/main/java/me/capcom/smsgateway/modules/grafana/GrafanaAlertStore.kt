@@ -15,6 +15,16 @@ class GrafanaAlertStore(
 
     fun list(): List<GrafanaAlertRecord> = synchronized(lock) { load() }
 
+    fun findById(id: String, receivedAt: Long? = null): GrafanaAlertRecord? = synchronized(lock) {
+        val records = load()
+        if (receivedAt != null && receivedAt > 0L) {
+            records.firstOrNull { it.id == id && it.receivedAt == receivedAt }
+                ?: records.firstOrNull { it.id == id }
+        } else {
+            records.firstOrNull { it.id == id }
+        }
+    }
+
     /**
      * Records [incoming]; returns the subset that is new (not a duplicate retry of
      * the same alert+status received within [DUPLICATE_WINDOW_MS]).
