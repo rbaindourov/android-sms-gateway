@@ -35,6 +35,12 @@
         app:summary="@string/grafana_alerts_summary"
         app:title="@string/grafana_alerts_dotdotdot" />
 
+    <Preference
+        android:icon="@drawable/ic_send"
+        app:fragment="me.capcom.smsgateway.ui.settings.AutoResponderSettingsFragment"
+        app:summary="@string/autoresponder_settings_summary"
+        app:title="@string/autoresponder_dotdotdot" />
+
     <PreferenceCategory app:title="@string/encryption">
         <EditTextPreference
             app:icon="@drawable/ic_encryption"

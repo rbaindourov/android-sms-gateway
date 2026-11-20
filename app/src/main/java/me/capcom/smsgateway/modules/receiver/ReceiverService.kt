@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import me.capcom.smsgateway.domain.WebhookDelivery
 import me.capcom.smsgateway.helpers.SubscriptionsHelper
+import me.capcom.smsgateway.modules.autoresponder.AutoResponderService
 import me.capcom.smsgateway.modules.incoming.IncomingMessagesService
 import me.capcom.smsgateway.modules.incoming.db.IncomingMessageType
 import me.capcom.smsgateway.modules.logs.LogsService
@@ -31,6 +32,7 @@ class ReceiverService : KoinComponent {
     private val logsService: LogsService by inject()
     private val incomingMessagesService: IncomingMessagesService by inject()
     private val receiverSettings: ReceiverSettings by inject()
+    private val autoResponderService: AutoResponderService by inject()
 
     private val eventsReceiver by lazy { EventsReceiver() }
     private val mmsContentObserver by lazy { MmsContentObserver() }
@@ -113,6 +115,9 @@ class ReceiverService : KoinComponent {
 
         if (payload != null && triggerWebhooks) {
             webHooksService.emit(context, payload.first, payload.second)
+            if (message is InboxMessage.Text) {
+                autoResponderService.onIncomingText(context, message)
+            }
         }
 
         if (payload != null) {

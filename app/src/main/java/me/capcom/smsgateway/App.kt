@@ -5,6 +5,7 @@ import android.content.Context
 import healthModule
 import me.capcom.smsgateway.data.dbModule
 import me.capcom.smsgateway.helpers.LocaleHelper
+import me.capcom.smsgateway.modules.autoresponder.autoresponderModule
 import me.capcom.smsgateway.modules.connection.connectionModule
 import me.capcom.smsgateway.modules.encryption.encryptionModule
 import me.capcom.smsgateway.modules.events.eventBusModule
@@ -56,6 +57,7 @@ class App: Application() {
                 webhooksModule,
                 localserverModule,
                 grafanaModule,
+                autoresponderModule,
                 pingModule,
                 connectionModule,
                 orchestratorModule,

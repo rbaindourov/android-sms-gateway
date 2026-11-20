@@ -2,6 +2,7 @@ package me.capcom.smsgateway.modules.settings
 
 import androidx.preference.PreferenceManager
 import me.capcom.smsgateway.helpers.SettingsHelper
+import me.capcom.smsgateway.modules.autoresponder.AutoResponderSettings
 import me.capcom.smsgateway.modules.encryption.EncryptionSettings
 import me.capcom.smsgateway.modules.gateway.GatewaySettings
 import me.capcom.smsgateway.modules.grafana.GrafanaAlertsSettings
@@ -46,6 +47,11 @@ val settingsModule = module {
     factory {
         GrafanaAlertsSettings(
             PreferencesStorage(get(), "grafana")
+        )
+    }
+    factory {
+        AutoResponderSettings(
+            PreferencesStorage(get(), "autoresponder")
         )
     }
     factory {

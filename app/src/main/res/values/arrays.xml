@@ -53,4 +53,12 @@
         <item>ru</item>
         <item>zh</item>
     </string-array>
+    <string-array name="autoresponder_filter_modes_titles">
+        <item>All non-contacts (excluding OTPs &amp; shortcodes)</item>
+        <item>Only non-contacts matching spam keywords</item>
+    </string-array>
+    <string-array name="autoresponder_filter_modes_values" translatable="false">
+        <item>all_non_contacts</item>
+        <item>keywords_only</item>
+    </string-array>
 </resources>

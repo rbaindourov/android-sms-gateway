@@ -1,0 +1,14 @@
+{
+  "name": "smsgateway-mcp-readonly",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Read-only local workstation MCP stdio bridge for SMSGateway with dynamic mDNS discovery and scoped read-only JWT auth.",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test test/"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

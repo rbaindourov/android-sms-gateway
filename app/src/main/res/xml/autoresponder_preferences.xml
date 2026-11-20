@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory app:title="@string/autoresponder_settings_title">
+        <Preference
+            android:icon="@drawable/ic_username"
+            android:key="transient.autoresponder_contacts_permission"
+            android:persistent="false"
+            android:title="@string/autoresponder_contacts_permission" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_sms"
+            android:key="autoresponder.ENABLED"
+            app:summary="@string/autoresponder_enabled_summary"
+            app:title="@string/autoresponder_enabled" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_notifications"
+            android:key="autoresponder.REQUIRE_APPROVAL"
+            app:summary="@string/autoresponder_require_approval_summary"
+            app:title="@string/autoresponder_require_approval" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_advanced"
+            android:key="autoresponder.EXCLUDE_CONTACTS"
+            app:summary="@string/autoresponder_exclude_contacts_summary"
+            app:title="@string/autoresponder_exclude_contacts" />
+        <ListPreference
+            android:defaultValue="all_non_contacts"
+            android:entries="@array/autoresponder_filter_modes_titles"
+            android:entryValues="@array/autoresponder_filter_modes_values"
+            android:icon="@drawable/ic_code"
+            android:key="autoresponder.FILTER_MODE"
+            android:title="@string/autoresponder_filter_mode"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            android:icon="@drawable/ic_code"
+            android:key="autoresponder.SPAM_KEYWORDS"
+            app:title="@string/autoresponder_spam_keywords"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            android:icon="@drawable/ic_cloud_server"
+            android:key="autoresponder.PITCH_URL"
+            app:title="@string/autoresponder_pitch_url"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            android:icon="@drawable/ic_messages"
+            android:key="autoresponder.PITCH_TEMPLATE"
+            app:title="@string/autoresponder_pitch_template"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            android:defaultValue="30"
+            android:icon="@drawable/ic_timer"
+            android:key="autoresponder.COOLDOWN_DAYS"
+            app:title="@string/autoresponder_cooldown_days"
+            app:useSimpleSummaryProvider="true" />
+        <Preference
+            android:icon="@drawable/ic_retry"
+            android:key="transient.autoresponder_test_draft"
+            android:persistent="false"
+            app:summary="@string/autoresponder_test_draft_summary"
+            app:title="@string/autoresponder_test_draft" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="transient.autoresponder_recent"
+        app:title="@string/autoresponder_recent_activity" />
+</androidx.preference.PreferenceScreen>
